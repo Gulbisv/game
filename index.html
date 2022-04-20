@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valters Gulbis 12.grupa 151RBC052</title>
+    <style>
+        body {
+            background-color: antiquewhite;
+            align-content: center;
+        }
+
+        button {
+            padding: 10px;
+            background-color: rgb(148, 222, 224);
+            color: black;
+            width: 100px;
+            border-radius: 15px;
+        }
+
+        button:hover {
+            background-color: rgb(75, 200, 204);
+            cursor: pointer;
+
+        }
+        #container {
+            text-align: center;
+        }
+
+        .start-value   {
+            display: flex;
+            justify-content: center;
+        }
+
+        #select-moves {
+            display: flex;
+            justify-content: center;
+        }
+
+        #player-1-score,
+        #player-2-score {
+            display: flex;
+            justify-content: center;
+        }
+
+        #result-1,
+        #result-2 {
+            margin-left: 10px;
+        }
+
+        p {
+            font-size: 20px;
+        }
+
+        #your-move {
+            color: green;
+        }
+
+        .chose-move {
+            font-size: 40px;
+        }
+
+        #result-text {
+            padding-top: 100px;
+            font-size: 40px;
+        }
+
+        #reset-game {
+            margin-top: 30px;
+        }
+
+        
+
+        #remove-1,
+        #remove-3,
+        #your-move,
+        #computer-move,
+        #main-game-info {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="game-start-wrapper">
+            <div id="main-game-info">
+                <div id="player-1-score">
+                    <p>Jūsu rezultāts -- </p>
+                    <p id="result-1">0</p>
+                </div>
+                <div class="start-value">
+                    <p id="start-number" ></p>
+                    <p id="start-number-3"></p>
+                </div>
+                <div id="player-2-score">
+                    <p>Datora rezultāts -- </p>
+                    <p id="result-2">0</p>
+                </div>
+            </div>
+        
+            <div id="start-option">
+                <p class="chose-move">Kurš izdarīs pirmo gājienu?</p>
+                <button id="player-1-starts" onclick="YourMove()">Jūs</button>
+                <button id="player-2-starts" onclick="ComputerMove()">Dators</button>
+            </div>
+            <div id="player-moves">
+                <p id="your-move">Jūsu gājiens</p>
+            </div>
+            <div id="select-moves">
+                <button id="remove-1" onclick="RemoveOne()">Noņemt 1</button>
+                <button id="remove-3" onclick="RemoveThree()">Noņemt 3</button>
+            
+            </div>
+            <div id="result">
+                <p id="result-text"></p>
+            </div>
+            <div id="reset-game">
+                <button id="restart" value="Reset Data" onclick="window.location.reload();">Jauna spēle</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        /* 
+            Definēti mainīgie
+        */
+        var resultOne = document.getElementById('result-1');
+        var resultTwo = document.getElementById('result-2');
+        var startNumber = document.getElementById('start-number');
+        var startNumberThrees = document.getElementById('start-number-3');
+        var whoMoves = document.getElementById('your-move');
+        var remove1 = document.getElementById('remove-1');
+        var remove3 = document.getElementById('remove-3');
+        var computerFinished = false;
+        var computerText = 'Datora gājiens';
+        var playerText = 'Jūsu gājiens';
+        var ones = '1111';
+        var threes = '333';
+        var resultText = document.getElementById('result-text');
+        var gameMain = document.getElementById('main-game-info');
+
+        /* 
+            Spēlētāja gājiena funkcija
+        */
+        function YourMove() {
+            document.getElementById('start-option').style.display = 'none';
+            remove1.style.display = 'block';
+            remove3.style.display = 'block';
+            whoMoves.style.display = 'block';
+            document.getElementById('main-game-info').style.display = 'block';
+            startNumber.innerHTML = ones;
+            startNumberThrees.innerHTML = threes;
+        }
+        
+        /* 
+            Event listeners pogām Noņemt 1 un Noņemt 3 un pieskaita atņemto rezultātu
+        */
+        remove1.addEventListener("click", function() {
+            whoMoves.innerHTML = computerText;
+            resultOne.innerHTML = parseInt(resultOne.innerHTML) + 1;
+
+            remove1.style.display = 'none';
+            remove3.style.display = 'none';
+
+            gameOver();
+            ComputerMove();     
+        });
+
+        remove3.addEventListener("click", function() {
+            whoMoves.innerHTML = computerText;
+            resultOne.innerHTML = parseInt(resultOne.innerHTML) + 3;
+
+            remove1.style.display = 'none';
+            remove3.style.display = 'none';
+
+            gameOver();
+            ComputerMove();
+        });
+
+        /* 
+            Datora gājiena funkcija
+        */
+        function ComputerMove() {
+            document.getElementById('start-option').style.display = 'none';
+            whoMoves.innerHTML = computerText;
+            whoMoves.style.display = 'block';
+            document.getElementById('main-game-info').style.display = 'block';
+
+            if(startNumber.innerHTML == '' && startNumberThrees.innerHTML == '') {
+                startNumber.innerHTML = ones;
+                startNumberThrees.innerHTML = threes;
+            }
+
+            timeForComputer();
+        }
+
+        /* 
+            Izveidota funkcija, kas izvēlās automātiski noņemt 1 vai 3 pēc 3 sekundēm
+        */
+        function timeForComputer() {
+            if (startNumber.innerHTML == '') {
+                var functions = [RemoveComputerThree];
+            } else if (startNumberThrees.innerHTML == '') {
+                var functions = [RemoveComputerOne];
+            } else {
+                var functions = [RemoveComputerOne, RemoveComputerThree];
+            }
+
+            setTimeout(() => {function randomNumber(n) { 
+	            return Math.floor( Math.random() * n ); 
+            } 
+                functions[ randomNumber( functions.length ) ]();
+
+                computerFinished = true;
+                
+                if (computerFinished && startNumber.innerHTML !='' && startNumberThrees.innerHTML != '') {
+                    remove1.style.display = 'block';
+                    remove3.style.display = 'block';
+                    
+                    whoMoves.innerHTML = playerText;
+                } else if (computerFinished && startNumber.innerHTML !='') {
+                    remove1.style.display = 'block';
+                    
+                    whoMoves.innerHTML = playerText;
+                } else if (computerFinished && startNumberThrees.innerHTML !='') {
+                    remove3.style.display = 'block';
+                    
+                    whoMoves.innerHTML = playerText;
+                }
+
+            }, 3000);
+        }
+
+        /*
+            funkcijas, kas noņem 1 vai 3 no skaitļu virknes
+        */
+        function RemoveOne() {
+            startNumber.textContent = startNumber.textContent.slice(0, -1); 
+        }
+
+        function RemoveThree() {
+            startNumberThrees.textContent = startNumberThrees.textContent.slice(0, -1);
+        }
+
+        function RemoveComputerOne() {
+            startNumber.textContent = startNumber.textContent.slice(0, -1);
+            resultTwo.innerHTML = parseInt(resultTwo.innerHTML) + 1
+            gameOver();
+        }
+
+        function RemoveComputerThree() {
+            startNumberThrees.textContent = startNumberThrees.textContent.slice(0, -1);
+            resultTwo.innerHTML = parseInt(resultTwo.innerHTML) + 3
+            gameOver();
+        }
+
+        /* 
+            Spēles beigas, kad tiek sasniegts 8, beidzas skaitļu virkne vai tiek pārsniegts 8
+        */
+        function gameOver() {
+            if(parseInt(resultOne.innerHTML) >= 8) {
+                gameMain.style.display = 'none';
+                document.getElementById('select-moves').style.display = 'none';
+                whoMoves.style.display = 'none';
+                resultText.innerHTML = 'Tu esi uzvarējis!';
+            } else if (parseInt(resultTwo.innerHTML) >= 8) {
+                gameMain.style.display = 'none';
+                whoMoves.style.display = 'none';
+                document.getElementById('select-moves').style.display = 'none';
+                resultText.innerHTML = 'Diemžēl tu zaudēji :(';
+            } else if(startNumber.innerHTML == '' && startNumberThrees.innerHTML == '') {
+                gameMain.style.display = 'none';
+                whoMoves.style.display = 'none';
+                document.getElementById('select-moves').style.display = 'none';
+                resultText.innerHTML = 'Neižķirts - skaitļu virkne beidzās!';
+            }
+        }
+
+    </script>
+</body>
+</html>
